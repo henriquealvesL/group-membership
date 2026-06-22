@@ -64,6 +64,9 @@ class GroupMembership:
         # Callback fired on the application layer whenever the view changes
         self.on_view_change: Optional[Callable[[View], None]] = None
 
+        # Callback for application-level messages (e.g. chat)
+        self.on_message: Optional[Callable[[dict], None]] = None
+
         self._fd = FailureDetector(
             self_addr      = self.addr,
             members_getter = self._get_members,
@@ -130,6 +133,13 @@ class GroupMembership:
         with self._lock:
             return self._view
 
+    def broadcast(self, **payload):
+        """Send an APP_MESSAGE to all current group members (including self)."""
+        with self._lock:
+            members = list(self._view.members) if self._view else []
+        for member in members:
+            self._send(member, MsgType.APP_MESSAGE, **payload)
+
     # ── Internal: TCP server ──────────────────────────────────────────
 
     def _start_server(self):
@@ -188,6 +198,10 @@ class GroupMembership:
 
         elif t == MsgType.VIEW_INSTALL:
             self._install_view(View.from_dict(msg["view"]))
+
+        elif t == MsgType.APP_MESSAGE:
+            if self.on_message:
+                self.on_message(msg)
 
     # ── Internal: membership protocol ────────────────────────────────
 

@@ -9,6 +9,7 @@ class MsgType:
     VIEW_PROPOSAL = "VIEW_PROPOSAL"  # coordinator proposes a new view
     VIEW_ACK      = "VIEW_ACK"       # member accepts the proposal
     VIEW_INSTALL  = "VIEW_INSTALL"   # coordinator orders installation
+    APP_MESSAGE   = "APP_MESSAGE"    # application-layer message (chat, etc.)
 
 
 def encode(msg_type: str, **payload) -> bytes:
