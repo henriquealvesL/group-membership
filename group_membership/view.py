@@ -12,7 +12,7 @@ class View:
     A sequence of views V0, V1, V2, ... is maintained over time.
     Each transition is caused by a join, a graceful leave, or a detected failure.
 
-    Properties (from the slides):
+    Properties:
       - Integrity:    a view is only installed by its own members
       - Initial view: V0 has a pre-defined set of members
       - Total order:  all processes install views in the same order
@@ -22,8 +22,6 @@ class View:
 
     view_id: int
     members: List[Member]
-
-    # ── Derived properties ────────────────────────────────────────────
 
     def coordinator(self) -> Member:
         """
@@ -41,16 +39,12 @@ class View:
         new_members = [m for m in self.members if m != member]
         return View(self.view_id + 1, new_members)
 
-    # ── Serialization ─────────────────────────────────────────────────
-
     def to_dict(self) -> dict:
         return {"view_id": self.view_id, "members": [list(m) for m in self.members]}
 
     @classmethod
     def from_dict(cls, d: dict) -> "View":
         return cls(d["view_id"], [tuple(m) for m in d["members"]])
-
-    # ── Helpers ───────────────────────────────────────────────────────
 
     def __contains__(self, member: Member) -> bool:
         return member in self.members

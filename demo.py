@@ -24,8 +24,6 @@ import time
 
 from group_membership import GroupMembership, View
 
-# ── Logging ───────────────────────────────────────────────────────────────────
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  %(levelname)-8s  %(message)s",
@@ -33,24 +31,13 @@ logging.basicConfig(
 )
 
 
-# ── View-change callback (application layer) ──────────────────────────────────
-
 def on_view_change(view: View):
-    """
-    This is the hook the application layer registers to be notified whenever
-    the group composition changes.
-
-    In the chat application, this would be used to update the list of
-    participants and display join/leave system messages.
-    """
     members = ", ".join(f"{h}:{p}" for h, p in sorted(view.members))
     print(f"\n{'='*60}")
     print(f"  VIEW INSTALLED  →  {view}")
     print(f"  Members now: {members}")
     print(f"{'='*60}\n")
 
-
-# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(

@@ -53,18 +53,13 @@ class GroupMembership:
         self._view:    Optional[View] = None
         self._lock     = threading.Lock()
 
-        # Coordinator-side view change state
         self._pending:     Optional[View] = None
         self._acks:        set            = set()
         self._acks_needed: int            = 0
 
-        # Signals the joining process that it has been accepted into a view
         self._joined_event = threading.Event()
 
-        # Callback fired on the application layer whenever the view changes
         self.on_view_change: Optional[Callable[[View], None]] = None
-
-        # Callback for application-level messages (e.g. chat)
         self.on_message: Optional[Callable[[dict], None]] = None
 
         self._fd = FailureDetector(
@@ -335,7 +330,6 @@ class GroupMembership:
             self._view    = view
             self._pending = None
 
-        # Start the failure detector the first time a view is installed
         if not self._fd_started:
             self._fd_started = True
             self._fd.start()
@@ -354,13 +348,7 @@ class GroupMembership:
                 target=self.on_view_change, args=(view,), daemon=True
             ).start()
 
-    # ── Internal: networking helpers ──────────────────────────────────
-
     def _send(self, dest: Member, msg_type: str, **payload):
-        """
-        Open a short-lived TCP connection (Berkeley Sockets), send one JSON
-        message, and close. This makes the socket usage explicit and stateless.
-        """
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.settimeout(2.0)

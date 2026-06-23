@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 chat.py — Distributed chat application using the Group Membership building block.
 
